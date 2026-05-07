@@ -1,0 +1,33 @@
+// data/energy_data.json
+{
+  "cities": [
+    {
+      "id": "dubai-001",
+      "name": "Dubai",
+      "consumption": "12.5 GW",
+      "load_status": "High",
+      "renewable_pct": "15%",
+      "coords": {"lat": 25.2048, "lng": 55.2708}
+    },
+    {
+      "id": "london-002",
+      "name": "London",
+      "consumption": "8.2 GW",
+      "load_status": "Stable",
+      "renewable_pct": "42%",
+      "coords": {"lat": 51.5074, "lng": -0.1278}
+    }
+  ],
+  "stations": [
+    {
+      "id": "st-101",
+      "name": "Tesla Supercharger V4",
+      "city": "Dubai",
+      "type": "CCS2",
+      "power": "350 kW",
+      "price": "$0.38 / kWh",
+      "occupancy": "85%",
+      "coords": {"lat": 25.1972, "lng": 55.2796}
+    }
+  ]
+}
