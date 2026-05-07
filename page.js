@@ -1,4 +1,3 @@
-"use client";
 import React from 'react';
 import { Zap, Search, Activity, BatteryCharging, Globe, PieChart } from 'lucide-react';
 import { motion } from 'framer-motion';
