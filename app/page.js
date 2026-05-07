@@ -1,102 +1,149 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { Zap, Activity, BatteryCharging, MapPin, Loader2, AlertCircle } from 'lucide-react';
+import { 
+  Zap, Search, Battery, ShieldCheck, MapPin, 
+  ChevronDown, Globe, Calculator, Info, ZapOff 
+} from 'lucide-react';
 import { motion } from 'framer-motion';
-import { cn } from '../lib/utils.jsx';
-import './globals.css';
 
-export default function OhmMapApp() {
-  const [stations, setStations] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    const fetchStations = async () => {
-      const apiKey = process.env.NEXT_PUBLIC_OPENCHARGE_API_KEY;
-      
-      if (!apiKey) {
-        setError("API Key is missing in Vercel settings.");
-        setLoading(false);
-        return;
-      }
-
-      try {
-        const response = await fetch(
-          `https://api.openchargemap.io/v3/poi/?output=json&countrycode=AE&maxresults=10&compact=true&key=${apiKey}`
-        );
-        
-        if (!response.ok) throw new Error("Failed to fetch from API");
-        
-        const data = await response.json();
-        setStations(data);
-      } catch (err) {
-        setError("Could not connect to energy grid.");
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchStations();
-  }, []);
+export default function GlobalOhmMap() {
+  const [search, setSearch] = useState("");
+  const [cost, setCost] = useState({ city: "", price: 0 });
 
   return (
-    <div className="min-h-screen bg-[#050505] text-white p-8 font-sans">
-      <nav className="mb-10 text-3xl font-black text-blue-500 tracking-tighter">
-        OHMMAP<span className="text-white">.COM</span>
-      </nav>
+    <div className="min-h-screen bg-[#f8fafc] text-slate-900 font-sans selection:bg-blue-500 selection:text-white">
       
-      <div className="grid grid-cols-12 gap-6">
-        {/* Map Placeholder */}
-        <div className="col-span-12 lg:col-span-8 bg-zinc-900 rounded-[2.5rem] h-[500px] relative overflow-hidden border border-zinc-800 shadow-2xl">
-           <div className="absolute inset-0 bg-[url('https://www.mapbox.com/static/images/dark-v11.png')] opacity-20 bg-cover grayscale"></div>
-           <div className="absolute top-8 left-8 bg-black/80 backdrop-blur-md p-5 rounded-3xl border border-white/10">
-              <p className="text-[10px] text-blue-500 font-black uppercase tracking-widest mb-1">Global Network</p>
-              <div className="text-green-400 font-mono text-xl font-bold uppercase flex items-center">
-                <Activity size={16} className="mr-2 animate-pulse" /> Live Status
-              </div>
-           </div>
-        </div>
-
-        {/* Info & API List */}
-        <div className="col-span-12 lg:col-span-4 space-y-6">
-          <div className="p-8 bg-gradient-to-br from-blue-600 to-indigo-900 rounded-[2.5rem] shadow-xl">
-            <Zap size={32} className="mb-6 text-white" />
-            <h2 className="text-xs font-black opacity-60 tracking-[0.3em] mb-2 uppercase">Peak Grid Load</h2>
-            <p className="text-5xl font-black font-mono tracking-tighter">15.4 GW</p>
+      {/* 1. Hero Section - العنوان الرئيسي الجذاب للبحث */}
+      <header className="bg-white border-b border-slate-200 sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+          <div className="text-2xl font-black text-blue-600 tracking-tighter">
+            OHMMAP<span className="text-slate-400">.COM</span>
           </div>
+          <nav className="hidden md:flex gap-8 text-sm font-bold text-slate-600 uppercase tracking-widest">
+            <a href="#map" className="hover:text-blue-600 transition">Map</a>
+            <a href="#guide" className="hover:text-blue-600 transition">Battery Guide</a>
+            <a href="#calc" className="hover:text-blue-600 transition">Cost Calculator</a>
+          </nav>
+        </div>
+      </header>
 
-          <div className="p-8 bg-zinc-900 rounded-[2.5rem] border border-zinc-800 shadow-xl">
-            <h3 className="text-zinc-500 text-[10px] font-black uppercase tracking-[0.25em] flex items-center mb-6">
-              <BatteryCharging size={16} className="mr-3 text-blue-500" /> Infrastructure Nodes
-            </h3>
-            
-            <div className="space-y-4 max-h-[320px] overflow-y-auto pr-2 custom-scrollbar">
-              {loading ? (
-                <div className="text-zinc-600 flex items-center py-4"><Loader2 className="animate-spin mr-2" size={16}/> Syncing with API...</div>
-              ) : error ? (
-                <div className="text-red-400 text-xs flex items-center bg-red-500/10 p-4 rounded-2xl border border-red-500/20">
-                  <AlertCircle className="mr-2" size={14} /> {error}
-                </div>
-              ) : (
-                stations.map((s) => (
-                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} key={s.ID} className="p-4 rounded-2xl border bg-zinc-950 border-zinc-800 hover:border-blue-500/50 transition-all">
-                    <div className="flex justify-between items-center">
-                      <div className="overflow-hidden">
-                        <div className="flex items-center gap-2 text-xs font-bold uppercase text-zinc-300 truncate">
-                          <MapPin size={10} className="text-blue-500 shrink-0" /> {s.AddressInfo.Title.split(' ')[0]} Node
-                        </div>
-                        <p className="text-[9px] text-zinc-600 font-bold uppercase mt-1 truncate">{s.AddressInfo.Town || "Urban Node"}</p>
-                      </div>
-                      <div className="h-2 w-2 rounded-full bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.6)] shrink-0"></div>
-                    </div>
-                  </motion.div>
-                ))
-              )}
+      {/* 2. Search & Search Engine Bait - صيد محركات البحث */}
+      <section className="py-20 bg-gradient-to-b from-white to-[#f8fafc]">
+        <div className="max-w-4xl mx-auto text-center px-6">
+          <motion.h1 
+            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+            className="text-5xl md:text-7xl font-black tracking-tight mb-6"
+          >
+            Ultimate EV Charging <span className="text-blue-600 text-shadow-sm">Solutions.</span>
+          </motion.h1>
+          <p className="text-xl text-slate-500 mb-10 leading-relaxed">
+            حلول مشاكل شحن سيارات BYD، تسلا، وفولكس فاجن. ابحث عن أقرب محطة شحن واحسب تكلفة الطاقة في مدينتك.
+          </p>
+          
+          {/* أداة البحث عن المكان */}
+          <div className="relative group max-w-2xl mx-auto shadow-2xl rounded-3xl overflow-hidden bg-white border-4 border-white">
+            <div className="flex items-center px-6 py-4">
+              <Search className="text-blue-500 mr-4" size={24} />
+              <input 
+                type="text"
+                placeholder="Enter city or location (e.g. Dubai, Riyadh)..."
+                className="w-full bg-transparent outline-none text-lg font-medium"
+                onChange={(e) => setSearch(e.target.value)}
+              />
+              <button className="bg-blue-600 text-white px-8 py-3 rounded-2xl font-bold hover:bg-blue-700 transition shadow-lg">
+                Find Stations
+              </button>
             </div>
           </div>
         </div>
-      </div>
+      </section>
+
+      {/* 3. Battery Knowledge Base - شرح أنواع البطاريات */}
+      <section id="guide" className="py-24 max-w-7xl mx-auto px-6">
+        <h2 className="text-3xl font-black mb-12 flex items-center gap-3 uppercase tracking-tighter">
+          <Battery className="text-blue-600" /> Battery Technology Guide
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {[
+            { title: "LFP Batteries", desc: "Long life, high safety. Best for daily city commuting and BYD models.", icon: <ShieldCheck className="text-green-500"/> },
+            { title: "NMC Batteries", desc: "High energy density. Perfect for long-range Tesla and luxury EVs.", icon: <Zap className="text-yellow-500"/> },
+            { title: "Solid State", desc: "The future of charging. Ultra-fast charging in under 5 minutes.", icon: <Globe className="text-blue-500"/> }
+          ].map((item, i) => (
+            <div key={i} className="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-sm hover:shadow-xl transition-all duration-500">
+              <div className="mb-4">{item.icon}</div>
+              <h3 className="text-xl font-bold mb-3">{item.title}</h3>
+              <p className="text-slate-500 text-sm leading-relaxed">{item.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* 4. Solving Problems Section - حلول مشاكل الشحن */}
+      <section className="bg-blue-600 py-24 text-white">
+        <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-12 items-center">
+          <div>
+            <h2 className="text-4xl font-black mb-6">How to fix BYD Charging Issues?</h2>
+            <ul className="space-y-4 text-lg opacity-90">
+              <li className="flex items-center gap-3"><ZapOff size={20}/> Use the correct Type-2 to GB/T Adapter.</li>
+              <li className="flex items-center gap-3"><ZapOff size={20}/> Ensure your home charger is grounded (Earth).</li>
+              <li className="flex items-center gap-3"><ZapOff size={20}/> Update the vehicle BMS software regularly.</li>
+            </ul>
+          </div>
+          <div className="bg-white/10 p-8 rounded-[3rem] backdrop-blur-md border border-white/20 font-mono text-sm leading-relaxed">
+             // Expert Tip for SEO:
+             "Always match the Kilowatts (kW) of the station with your car's Max Intake to avoid battery degradation."
+          </div>
+        </div>
+      </section>
+
+      {/* 5. Energy Cost Tool - أداة حساب التكلفة */}
+      <section id="calc" className="py-24 max-w-5xl mx-auto px-6 text-center">
+        <div className="bg-white p-12 rounded-[4rem] border border-slate-200 shadow-2xl relative overflow-hidden">
+          <div className="absolute top-0 right-0 p-10 opacity-5"><Calculator size={150}/></div>
+          <h2 className="text-3xl font-black mb-4">Energy Cost Calculator</h2>
+          <p className="text-slate-500 mb-10 italic">أدخل اسم الدولة أو المدينة لمعرفة متوسط تكلفة شحن سيارتك</p>
+          
+          <div className="flex flex-col md:flex-row gap-4 justify-center">
+            <input 
+              type="text" 
+              placeholder="Country/City Name" 
+              className="bg-slate-100 px-6 py-4 rounded-2xl outline-none focus:ring-2 ring-blue-500"
+            />
+            <button className="bg-slate-900 text-white px-10 py-4 rounded-2xl font-bold hover:bg-blue-600 transition">
+              Calculate Cost
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* 6. Footer - بيانات حقوق الملكية والدومين */}
+      <footer className="py-20 bg-slate-900 text-white text-center">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="text-3xl font-black mb-4 text-blue-500">OHMMAP.COM</div>
+          <p className="text-slate-500 text-sm tracking-widest uppercase mb-10">Premium Domain Asset for EV Infrastructure</p>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-left text-xs font-bold text-slate-400 border-t border-white/5 pt-10">
+            <div>
+              <p className="text-white mb-4 uppercase">Technologies</p>
+              <ul className="space-y-2 opacity-60 font-medium italic">
+                <li>Next.js 16</li>
+                <li>Tailwind CSS</li>
+                <li>Lucide Icons</li>
+                <li>Vercel Edge</li>
+              </ul>
+            </div>
+            <div>
+              <p className="text-white mb-4 uppercase">Markets</p>
+              <ul className="space-y-2 opacity-60 font-medium italic">
+                <li>Middle East</li>
+                <li>Europe</li>
+                <li>China</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </footer>
+
     </div>
   );
 }
