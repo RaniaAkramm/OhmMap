@@ -10,6 +10,7 @@
     "react-map-gl": "latest",
     "mapbox-gl": "latest",
     "clsx": "latest",
-    "tailwind-merge": "latest"
+    "tailwind-merge": "latest",
+    "recharts": "latest"
   }
 }
